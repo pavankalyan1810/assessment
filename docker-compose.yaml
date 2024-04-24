@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  assessmentsql-db:
+    image: sql:latest
+    container_name: assessment_sqldb
+    ports:
+      - "8524:3306"
+    environment : 
+      - MY_ROOT_PASSWORD : root
+      - MYSQL_DATABASE : assessment
+    volumes:
+      - assessment_data:/data/db
+    networks:
+      - assessmentnetwork
+
+  springbootapp:
+    image : assessment:test
+    container_name: assessment_service
+    ports:
+      - "8534:8085"
+    depends_on:
+      - assessmentsql-db
+    environment:
+      - SPRING_DATA_URL : jdbc:mysql://assessmentsql-db:8524/assessment
+    networks:
+      - assessmentnetwork
+
+networks:
+  assessmentnetwork:
+
+volumes:
+  assessment_data:
+
